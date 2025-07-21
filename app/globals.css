@@ -176,3 +176,34 @@ body {
   .data-action:hover {
     background: rgba(59, 130, 246, 0.1);
   }
+
+  /* Fix cell outline clipping */
+  table td {
+    position: relative;
+    z-index: 1;
+    overflow: visible !important;
+  }
+  
+  table td:focus-within {
+    z-index: 10;
+    isolation: isolate;
+    overflow: visible !important;
+  }
+  
+  table input:focus,
+  table textarea:focus {
+    position: relative;
+    z-index: 20;
+    outline: 2px solid rgb(59 130 246);
+    outline-offset: 2px;
+    overflow: visible !important;
+  }
+  
+  /* Ensure table container doesn't clip overflows */
+  table {
+    overflow: visible !important;
+  }
+  
+  .responsive-table {
+    overflow: visible !important;
+  }

@@ -657,13 +657,13 @@ export const ModernDataTable = () => {
 
       <style jsx>{`
         .responsive-table {
-          /* Fixed row height for consistent alignment */
-          --row-height: 48px;
+          /* Fixed row height for consistent alignment - accommodates 2 lines */
+          --row-height: 56px;
         }
 
         @media (max-width: 768px) {
           .responsive-table {
-            --row-height: 56px;
+            --row-height: 60px;
           }
         }
 
@@ -677,7 +677,7 @@ export const ModernDataTable = () => {
           padding: 0;
           border: 0;
           vertical-align: middle;
-          overflow: hidden;
+          overflow: visible;
         }
 
         .responsive-table :global(th) {
@@ -687,15 +687,22 @@ export const ModernDataTable = () => {
           vertical-align: middle;
         }
 
-        /* Multi-line text support */
+        /* Multi-line text support - limit to 2 lines for better readability */
         .responsive-table :global(.cell-content) {
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
-          line-height: 1.2;
-          max-height: 2.4em;
+          line-height: 1.4;
+          max-height: 2.8em;
           word-break: break-word;
+          text-overflow: ellipsis;
+        }
+        
+        /* Allow input focus outlines to be visible */
+        .responsive-table :global(input),
+        .responsive-table :global(textarea) {
+          overflow: visible;
         }
 
         /* Ensure table layout is truly fixed */

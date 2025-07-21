@@ -44,7 +44,7 @@ export const AddSupplierRow = forwardRef<{ startAdding: () => void }, AddSupplie
       }
     }, [isAdding])
 
-    const handleKeyDown = (e: React.KeyboardEvent, nextRef?: React.RefObject<HTMLInputElement>) => {
+    const handleKeyDown = (e: React.KeyboardEvent, nextRef?: React.RefObject<HTMLInputElement | null>) => {
       if (e.key === "Tab" && nextRef?.current) {
         e.preventDefault()
         nextRef.current.focus()
@@ -95,14 +95,14 @@ export const AddSupplierRow = forwardRef<{ startAdding: () => void }, AddSupplie
 
     if (!isAdding) {
       return (
-        <TableRow className="hover:bg-gray-50 transition-colors border-b border-gray-200">
-          <TableCell colSpan={6} className="p-1">
+        <TableRow className="hover:bg-gray-50 transition-colors border-b border-gray-200 h-12">
+          <TableCell colSpan={6} className="p-1 h-12">
             <Button
               variant="ghost"
-              className="w-full justify-start text-gray-600 hover:text-gray-700 h-6 text-xs"
+              className="w-full justify-start text-gray-600 hover:text-gray-700 h-10 text-sm"
               onClick={handleStartAdding}
             >
-              <Plus className="h-3 w-3 mr-2" />
+              <Plus className="h-4 w-4 mr-2" />
               Add new supplier (N)
             </Button>
           </TableCell>
@@ -111,31 +111,33 @@ export const AddSupplierRow = forwardRef<{ startAdding: () => void }, AddSupplie
     }
 
     return (
-      <TableRow className="hover:bg-gray-50 transition-colors border-b border-gray-200">
-        <TableCell className="p-1" style={{ width: columnWidths.actions }}>
-          <div className="flex items-center justify-center h-full">
+      <TableRow className="bg-gray-50 border-b border-gray-200 h-12">
+        <TableCell className="p-0 h-12" style={{ width: columnWidths.actions }}>
+          <div className="flex items-center justify-center gap-3 h-12 px-2">
+            <div className="h-4 w-4"></div>
             <Button
-              variant="outline"
               size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 action-button edit-action"
               onClick={handleSave}
-              disabled={loading}
-              className="h-6 w-6 p-0 mr-1"
+              disabled={loading || !isFormValid()}
               title="Save supplier"
             >
-              {loading ? <Loader2 className="h-2 w-2 animate-spin" /> : <Check className="h-2 w-2" />}
+              {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
             </Button>
             <Button
-              variant="outline"
               size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 action-button data-action"
               onClick={handleCancel}
-              className="h-6 w-6 p-0"
+              disabled={loading}
               title="Cancel"
             >
-              <X className="h-2 w-2" />
+              <X className="h-3 w-3" />
             </Button>
           </div>
         </TableCell>
-        <TableCell className="p-1" style={{ width: columnWidths.name }}>
+        <TableCell className="p-1 h-12" style={{ width: columnWidths.name }}>
           <FieldValidation error={getFieldError("name")}>
             <Input
               ref={nameInputRef}
@@ -148,40 +150,40 @@ export const AddSupplierRow = forwardRef<{ startAdding: () => void }, AddSupplie
                 }
               }}
               onKeyDown={(e) => handleKeyDown(e, websiteInputRef)}
-              className={`h-5 text-xs ${getFieldError("name") ? "border-red-500" : ""}`}
+              className={`h-8 text-sm ${getFieldError("name") ? "border-red-500" : ""}`}
               disabled={loading}
             />
           </FieldValidation>
         </TableCell>
-        <TableCell className="p-1" style={{ width: columnWidths.website }}>
+        <TableCell className="p-1 h-12" style={{ width: columnWidths.website }}>
           <Input
             ref={websiteInputRef}
             placeholder="Website *"
             value={formData.website}
             onChange={(e) => setFormData({ ...formData, website: e.target.value })}
             onKeyDown={(e) => handleKeyDown(e, phoneInputRef)}
-            className="h-5 text-xs"
+            className="h-8 text-sm"
             disabled={loading}
           />
         </TableCell>
-        <TableCell className="p-1" style={{ width: columnWidths.phone }}>
+        <TableCell className="p-1 h-12" style={{ width: columnWidths.phone }}>
           <Input
             ref={phoneInputRef}
             placeholder="Phone number"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             onKeyDown={(e) => handleKeyDown(e)}
-            className="h-5 text-xs"
+            className="h-8 text-sm"
             disabled={loading}
           />
         </TableCell>
-        <TableCell className="p-1" style={{ width: columnWidths.status }}>
+        <TableCell className="p-1 h-12" style={{ width: columnWidths.status }}>
           <Select
             value={formData.status}
             onValueChange={(value: "active" | "inactive") => setFormData({ ...formData, status: value })}
             disabled={loading}
           >
-            <SelectTrigger className="h-5 text-xs">
+            <SelectTrigger className="h-8 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -190,27 +192,8 @@ export const AddSupplierRow = forwardRef<{ startAdding: () => void }, AddSupplie
             </SelectContent>
           </Select>
         </TableCell>
-        <TableCell className="p-1" style={{ width: columnWidths.created }}>
-          <div className="flex gap-1 justify-center">
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-5 w-5 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
-              onClick={handleSave}
-              disabled={loading || !isFormValid()}
-            >
-              {loading ? <Loader2 className="h-2 w-2 animate-spin" /> : <Check className="h-2 w-2" />}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-5 w-5 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={handleCancel}
-              disabled={loading}
-            >
-              <X className="h-2 w-2" />
-            </Button>
-          </div>
+        <TableCell className="p-1 h-12" style={{ width: columnWidths.created }}>
+          <div className="text-sm text-gray-400 text-center">-</div>
         </TableCell>
       </TableRow>
     )

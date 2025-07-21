@@ -113,6 +113,12 @@ export const EditableSupplierRow = ({
     }
   }
 
+  const handleDoubleClickEdit = () => {
+    if (!isEditing && !isSpreadsheetMode) {
+      onEdit(supplier.id, {})
+    }
+  }
+
   const isFormValid = () => {
     return formData.name?.trim() !== "" && formData.website?.trim() !== ""
   }
@@ -249,18 +255,7 @@ export const EditableSupplierRow = ({
           </Select>
         </TableCell>
         <TableCell className="p-1 h-12" style={{ width: columnWidths.created }}>
-          <ButtonContainer>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={onCancel}
-              disabled={isSaving}
-              title="Cancel changes (Escape)"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </ButtonContainer>
+          <div className="text-sm text-gray-400 text-center">-</div>
         </TableCell>
       </TableRow>
     )
@@ -334,12 +329,16 @@ export const EditableSupplierRow = ({
               rowIndex={rowIndex}
               colIndex={0}
               isSpreadsheetMode={isSpreadsheetMode}
-              hasChanges={hasRowChanges}
+              hasChanges={hasRowChanges || false}
               onChange={handleSpreadsheetChange}
             />
           </div>
         ) : (
-          <div className="h-full flex items-center">
+          <div 
+            className="h-full flex items-center cursor-pointer" 
+            onDoubleClick={handleDoubleClickEdit}
+            title="Double-click to edit"
+          >
             <div className="cell-content" title={supplier.name}>
               {supplier.name}
             </div>
@@ -356,12 +355,16 @@ export const EditableSupplierRow = ({
               rowIndex={rowIndex}
               colIndex={1}
               isSpreadsheetMode={isSpreadsheetMode}
-              hasChanges={hasRowChanges}
+              hasChanges={hasRowChanges || false}
               onChange={handleSpreadsheetChange}
             />
           </div>
         ) : (
-          <div className="h-full flex items-center">
+          <div 
+            className="h-full flex items-center cursor-pointer" 
+            onDoubleClick={handleDoubleClickEdit}
+            title="Double-click to edit"
+          >
             {supplier.website ? (
               <a
                 href={supplier.website}
@@ -389,12 +392,16 @@ export const EditableSupplierRow = ({
               rowIndex={rowIndex}
               colIndex={2}
               isSpreadsheetMode={isSpreadsheetMode}
-              hasChanges={hasRowChanges}
+              hasChanges={hasRowChanges || false}
               onChange={handleSpreadsheetChange}
             />
           </div>
         ) : (
-          <div className="h-full flex items-center">
+          <div 
+            className="h-full flex items-center cursor-pointer" 
+            onDoubleClick={handleDoubleClickEdit}
+            title="Double-click to edit"
+          >
             {supplier.phone ? (
               <a
                 href={`tel:${supplier.phone}`}
@@ -419,7 +426,7 @@ export const EditableSupplierRow = ({
               rowIndex={rowIndex}
               colIndex={3}
               isSpreadsheetMode={isSpreadsheetMode}
-              hasChanges={hasRowChanges}
+              hasChanges={hasRowChanges || false}
               onChange={handleSpreadsheetChange}
             />
           </div>
