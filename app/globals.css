@@ -3,7 +3,13 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1, 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
 @layer utilities {
@@ -90,5 +96,59 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Single actions column improvements */
+  .actions-column {
+    min-width: 140px;
+    max-width: 140px;
+    position: sticky;
+    left: 24px;
+    background: white;
+    border-right: 1px solid #e5e7eb;
+    z-index: 5;
+  }
+  
+  .actions-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    height: 3rem;
+    padding: 0 0.5rem;
+  }
+  
+  .action-button {
+    transition: all 0.2s ease-in-out;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  .action-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Button order visual hierarchy */
+  .checkbox-action {
+    order: 1;
+  }
+  
+  .edit-action {
+    order: 2;
+    background: rgba(107, 114, 128, 0.05);
+  }
+  
+  .edit-action:hover {
+    background: rgba(107, 114, 128, 0.1);
+  }
+  
+  .data-action {
+    order: 3;
+    background: rgba(59, 130, 246, 0.05);
+  }
+  
+  .data-action:hover {
+    background: rgba(59, 130, 246, 0.1);
   }
 }

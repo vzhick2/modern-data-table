@@ -146,18 +146,9 @@ export const ModernDataTable = () => {
 
   const columns = useMemo(
     () => [
-      // Edit button column - moved to the left
+      // Single actions column containing all buttons
       columnHelper.display({
-        id: "edit",
-        header: "",
-        cell: () => null, // Handled in EditableSupplierRow
-        enableSorting: false,
-        enableHiding: false,
-        size: columnWidths.edit,
-      }),
-      // Checkbox column - hidden in spreadsheet mode
-      columnHelper.display({
-        id: "select",
+        id: "actions",
         header: ({ table }) =>
           !isSpreadsheetMode ? (
             <div className="flex items-center justify-center h-8 w-full">
@@ -172,10 +163,10 @@ export const ModernDataTable = () => {
               />
             </div>
           ) : null,
-        cell: () => null,
+        cell: () => null, // Handled in EditableSupplierRow
         enableSorting: false,
         enableHiding: false,
-        size: isSpreadsheetMode ? 0 : columnWidths.select,
+        size: columnWidths.actions,
       }),
       columnHelper.accessor("name", {
         header: "Supplier Name",
@@ -438,8 +429,7 @@ export const ModernDataTable = () => {
             <Table className="border-0 w-full" style={{ tableLayout: "fixed" }}>
               <colgroup>
                 <col style={{ width: "24px" }} />
-                <col style={{ width: `${columnWidths.edit}px` }} />
-                {!isSpreadsheetMode && <col style={{ width: `${columnWidths.select}px` }} />}
+                <col style={{ width: `${columnWidths.actions}px` }} />
                 <col style={{ width: `${columnWidths.name}px` }} />
                 <col style={{ width: `${columnWidths.website}px` }} />
                 <col style={{ width: `${columnWidths.phone}px` }} />
@@ -463,15 +453,9 @@ export const ModernDataTable = () => {
                       </div>
                     </TableHead>
                     {headerGroup.headers.map((header, index) => {
-                      // Skip rendering select column header in spreadsheet mode
-                      if (header.id === "select" && isSpreadsheetMode) {
-                        return null
-                      }
-
                       const isLastColumn = index === headerGroup.headers.length - 1
-                      const isEditColumn = header.id === "edit"
-                      const isSelectColumn = header.id === "select"
-                      const showResizer = !isLastColumn && !isEditColumn && !isSelectColumn
+                      const isActionsColumn = header.id === "actions"
+                      const showResizer = !isLastColumn && !isActionsColumn
 
                       return (
                         <TableHead
@@ -483,7 +467,7 @@ export const ModernDataTable = () => {
                             className={`flex items-center gap-2 pr-4 py-2 px-2 h-8 transition-colors ${
                               header.column.getCanSort()
                                 ? "cursor-pointer select-none hover:bg-gray-50"
-                                : header.id !== "edit" && header.id !== "select"
+                                : header.id !== "actions"
                                   ? "hover:bg-gray-50"
                                   : ""
                             }`}
