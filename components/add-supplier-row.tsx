@@ -96,10 +96,7 @@ export const AddSupplierRow = forwardRef<{ startAdding: () => void }, AddSupplie
     if (!isAdding) {
       return (
         <TableRow className="hover:bg-gray-50 transition-colors border-b border-gray-200">
-          <TableCell className="p-0" />
-          <TableCell className="p-0" />
-          {!isSpreadsheetMode && <TableCell className="p-1" />}
-          <TableCell colSpan={isSpreadsheetMode ? 4 : 4} className="p-1">
+          <TableCell colSpan={6} className="p-1">
             <Button
               variant="ghost"
               className="w-full justify-start text-gray-600 hover:text-gray-700 h-6 text-xs"
@@ -115,9 +112,29 @@ export const AddSupplierRow = forwardRef<{ startAdding: () => void }, AddSupplie
 
     return (
       <TableRow className="hover:bg-gray-50 transition-colors border-b border-gray-200">
-        <TableCell className="p-0" />
-        <TableCell className="p-0" />
-        {!isSpreadsheetMode && <TableCell className="p-1" />}
+        <TableCell className="p-1" style={{ width: columnWidths.actions }}>
+          <div className="flex items-center justify-center h-full">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSave}
+              disabled={loading}
+              className="h-6 w-6 p-0 mr-1"
+              title="Save supplier"
+            >
+              {loading ? <Loader2 className="h-2 w-2 animate-spin" /> : <Check className="h-2 w-2" />}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCancel}
+              className="h-6 w-6 p-0"
+              title="Cancel"
+            >
+              <X className="h-2 w-2" />
+            </Button>
+          </div>
+        </TableCell>
         <TableCell className="p-1" style={{ width: columnWidths.name }}>
           <FieldValidation error={getFieldError("name")}>
             <Input

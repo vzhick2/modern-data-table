@@ -169,7 +169,6 @@ export const EditableSupplierRow = ({
   if (isEditing) {
     return (
       <TableRow className="bg-gray-50 border-b border-gray-200 h-12">
-        <TableCell className="p-0 h-12" />
         <TableCell className="p-0 h-12" style={{ width: columnWidths.actions }}>
           <div className="flex items-center justify-center gap-3 h-12 px-2">
             <Checkbox
@@ -275,7 +274,6 @@ export const EditableSupplierRow = ({
       data-state={isSelected && "selected"}
       onClick={handleRowClick}
     >
-      <TableCell className="p-0 h-12" />
       <TableCell className="p-0 h-12" style={{ width: columnWidths.actions }}>
         {!isSpreadsheetMode ? (
           <div className="flex items-center justify-center gap-3 h-12 px-2">

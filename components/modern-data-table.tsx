@@ -281,7 +281,7 @@ export const ModernDataTable = () => {
     })
   }
 
-  const focusedRowIndex = useKeyboardNavigation({
+  const { focusedRowIndex } = useKeyboardNavigation({
     totalRows: table.getRowModel().rows.length,
     rowSelection,
     setRowSelection,
@@ -379,7 +379,7 @@ export const ModernDataTable = () => {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="w-full">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="flex items-center justify-between">
@@ -396,10 +396,10 @@ export const ModernDataTable = () => {
 
   return (
     <>
-      <div data-table-container className="responsive-table w-full">
+      <div data-table-container className="responsive-table w-full full-width-table">
         {/* Search and Filters - No card wrapper */}
-        <div className="px-2 py-4 space-y-3">
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <div className="py-4 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between px-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
               <Input
@@ -420,38 +420,25 @@ export const ModernDataTable = () => {
               )}
             </div>
           </div>
-          <StatusFilters activeFilter={statusFilter} onFilterChange={setStatusFilter} counts={statusCounts} />
+          <div className="px-4">
+            <StatusFilters activeFilter={statusFilter} onFilterChange={setStatusFilter} counts={statusCounts} />
+          </div>
         </div>
 
         {/* Table - Full width, no borders */}
-        <div className="w-full overflow-hidden">
-          <div style={{ width: "100%", tableLayout: "fixed" }}>
-            <Table className="border-0 w-full" style={{ tableLayout: "fixed" }}>
-              <colgroup>
-                <col style={{ width: "24px" }} />
-                <col style={{ width: `${columnWidths.actions}px` }} />
-                <col style={{ width: `${columnWidths.name}px` }} />
-                <col style={{ width: `${columnWidths.website}px` }} />
-                <col style={{ width: `${columnWidths.phone}px` }} />
-                <col style={{ width: `${columnWidths.status}px` }} />
-                <col style={{ width: `${columnWidths.created}px` }} />
-              </colgroup>
+        <div className="w-full">
+          <Table className="border-0 w-full" style={{ tableLayout: "fixed", width: "100%" }}>
+            <colgroup>
+              <col style={{ width: `${columnWidths.actions}px` }} />
+              <col style={{ width: `${columnWidths.name}px` }} />
+              <col style={{ width: `${columnWidths.website}px` }} />
+              <col style={{ width: `${columnWidths.phone}px` }} />
+              <col style={{ width: `${columnWidths.status}px` }} />
+              <col style={{ width: `${columnWidths.created}px` }} />
+            </colgroup>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id} className="border-b border-gray-200 h-8">
-                    <TableHead className="w-6 p-0 border-0 h-8">
-                      <div className="flex items-center justify-center h-8 w-full pl-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-5 w-5 p-0 text-gray-400 hover:text-gray-600"
-                          onClick={resetColumnWidths}
-                          title="Reset column widths"
-                        >
-                          <Columns3 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableHead>
                     {headerGroup.headers.map((header, index) => {
                       const isLastColumn = index === headerGroup.headers.length - 1
                       const isActionsColumn = header.id === "actions"
@@ -473,6 +460,21 @@ export const ModernDataTable = () => {
                             }`}
                             onClick={header.column.getToggleSortingHandler()}
                           >
+                            {/* Show reset button only in actions column header */}
+                            {isActionsColumn && !isSpreadsheetMode && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-5 w-5 p-0 text-gray-400 hover:text-gray-600 mr-1"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  resetColumnWidths()
+                                }}
+                                title="Reset column widths"
+                              >
+                                <Columns3 className="h-3 w-3" />
+                              </Button>
+                            )}
                             {header.isPlaceholder
                               ? null
                               : flexRender(header.column.columnDef.header, header.getContext())}
@@ -519,7 +521,7 @@ export const ModernDataTable = () => {
 
                 {loading && !table.getRowModel().rows?.length ? (
                   <TableRow className="h-12">
-                    <TableCell colSpan={columns.length + 1} className="h-12 text-center border-0">
+                    <TableCell colSpan={columns.length} className="h-12 text-center border-0">
                       <div className="flex items-center justify-center gap-2">
                         <Loader2 className="h-3 w-3 animate-spin" />
                         <span className="text-xs">Loading suppliers...</span>
@@ -564,7 +566,7 @@ export const ModernDataTable = () => {
                   ))
                 ) : (
                   <TableRow className="h-12">
-                    <TableCell colSpan={columns.length + 1} className="h-12 text-center border-0">
+                    <TableCell colSpan={columns.length} className="h-12 text-center border-0">
                       <div className="flex flex-col items-center gap-2 text-gray-500">
                         <AlertCircle className="h-6 w-6" />
                         <p className="text-xs">No suppliers found</p>
@@ -589,10 +591,9 @@ export const ModernDataTable = () => {
               </TableBody>
             </Table>
           </div>
-        </div>
 
         {/* Pagination */}
-        <div className="px-2">
+        <div className="px-4">
           <PaginationControls
             pageIndex={pagination.pageIndex}
             pageSize={pagination.pageSize}

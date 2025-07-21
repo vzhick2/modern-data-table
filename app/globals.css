@@ -10,6 +10,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.01em;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 @layer utilities {
@@ -91,12 +94,34 @@ body {
 }
 
 @layer base {
+  html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Full width table styling */
+  .full-width-table {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .full-width-table table {
+    width: 100% !important;
+  }
+  
+  .full-width-table tr {
+    width: 100% !important;
+  }
+}
   
   /* Single actions column improvements */
   .actions-column {
@@ -151,4 +176,3 @@ body {
   .data-action:hover {
     background: rgba(59, 130, 246, 0.1);
   }
-}
