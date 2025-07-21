@@ -101,7 +101,7 @@ export const EditableSupplierRow = ({
     }
   }, [isEditing, onCancel])
 
-  const handleKeyDown = (e: React.KeyboardEvent, nextRef?: React.RefObject<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent, nextRef?: React.RefObject<HTMLInputElement | null>) => {
     if (e.key === "Tab" && nextRef?.current) {
       e.preventDefault()
       nextRef.current.focus()
