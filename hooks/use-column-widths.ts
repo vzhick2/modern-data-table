@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
+import { useMobileDetection } from "./use-mobile-detection"
 
 interface ColumnWidths {
   actions: number
@@ -31,20 +32,9 @@ const MOBILE_WIDTHS: ColumnWidths = {
 }
 
 export const useColumnWidths = () => {
-  const [isMobile, setIsMobile] = useState(false)
+  const { isMobile } = useMobileDetection()
   const [columnWidths, setColumnWidths] = useState<ColumnWidths>(DEFAULT_WIDTHS)
   const [isResizing, setIsResizing] = useState<string | null>(null)
-
-  // Check if we're on mobile
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768)
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   // Update column widths based on screen size
   useEffect(() => {

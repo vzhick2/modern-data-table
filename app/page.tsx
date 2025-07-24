@@ -1,8 +1,9 @@
 import { ModernDataTable } from "@/components/modern-data-table"
+import { ErrorBoundary } from "@/components/error-boundary"
 
 export default function Home() {
   return (
-    <div className="w-full">
+    <div className="w-full pb-24">
       <div className="px-4 py-6 bg-gray-50 border-b">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Supplier Management</h1>
         <p className="text-gray-600">
@@ -10,7 +11,9 @@ export default function Home() {
         </p>
       </div>
 
-      <ModernDataTable />
+      <ErrorBoundary>
+        <ModernDataTable />
+      </ErrorBoundary>
     </div>
   )
 }

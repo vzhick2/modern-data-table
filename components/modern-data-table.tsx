@@ -42,6 +42,8 @@ import { usePagination } from "@/hooks/use-pagination"
 import { useShiftSelection } from "@/hooks/use-selection"
 import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation"
 import { useColumnWidths } from "@/hooks/use-column-widths"
+import { useMobileDetection } from "@/hooks/use-mobile-detection"
+import { useDebouncedSearch } from "@/hooks/use-debounce"
 import { AddSupplierRow } from "./add-supplier-row"
 import { EditableSupplierRow } from "./editable-supplier-row"
 import { ExpandableRowDetails } from "./expandable-row-details"
@@ -58,6 +60,8 @@ import { PurchaseHistoryModal } from "./purchase-history-modal"
 const columnHelper = createColumnHelper<Supplier>()
 
 export const ModernDataTable = () => {
+  const { isMobile } = useMobileDetection()
+  const { searchValue, debouncedSearchValue, updateSearch, clearSearch } = useDebouncedSearch("", 100)
   const {
     data,
     allData,
@@ -245,6 +249,11 @@ export const ModernDataTable = () => {
   const selectedIds = selectedRows.map((row) => row.original.id)
   const hasInactiveSelected = selectedRows.some((row) => row.original.status === "inactive")
 
+  // Sync debounced search value with global filter
+  useEffect(() => {
+    setGlobalFilter(debouncedSearchValue)
+  }, [debouncedSearchValue, setGlobalFilter])
+
   const { currentCell, setCurrentCell, handleCellClick } = useSpreadsheetNavigation({
     totalRows: table.getRowModel().rows.length,
     isSpreadsheetMode,
@@ -404,16 +413,16 @@ export const ModernDataTable = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
               <Input
                 placeholder="Search suppliers... (try: 2024 or 01/2024)"
-                value={globalFilter ?? ""}
-                onChange={(e) => setGlobalFilter(e.target.value)}
+                value={searchValue}
+                onChange={(e) => updateSearch(e.target.value)}
                 className="pl-9 pr-9 h-8 text-xs"
               />
-              {globalFilter && (
+              {searchValue && (
                 <Button
                   variant="ghost"
                   size="sm"
                   className="absolute right-1 top-1/2 transform -translate-y-1/2 h-5 w-5 p-0"
-                  onClick={() => setGlobalFilter("")}
+                  onClick={clearSearch}
                 >
                   <X className="h-2 w-2" />
                 </Button>
@@ -442,7 +451,7 @@ export const ModernDataTable = () => {
                     {headerGroup.headers.map((header, index) => {
                       const isLastColumn = index === headerGroup.headers.length - 1
                       const isActionsColumn = header.id === "actions"
-                      const showResizer = !isLastColumn && !isActionsColumn
+                      const showResizer = !isLastColumn && !isActionsColumn && !isMobile
 
                       return (
                         <TableHead
@@ -570,10 +579,10 @@ export const ModernDataTable = () => {
                       <div className="flex flex-col items-center gap-2 text-gray-500">
                         <AlertCircle className="h-6 w-6" />
                         <p className="text-xs">No suppliers found</p>
-                        {(globalFilter || statusFilter !== "all") && (
+                        {(searchValue || statusFilter !== "all") && (
                           <div className="flex gap-2">
-                            {globalFilter && (
-                              <Button variant="outline" size="sm" onClick={() => setGlobalFilter("")}>
+                            {searchValue && (
+                              <Button variant="outline" size="sm" onClick={clearSearch}>
                                 <span className="text-xs">Clear search</span>
                               </Button>
                             )}

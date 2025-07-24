@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Edit3, Save, X, Loader2, ChevronUp, Download, Archive, Trash2, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { useMobileDetection } from "@/hooks/use-mobile-detection"
 
 interface FloatingControlsProps {
   isSpreadsheetMode: boolean
@@ -40,18 +41,7 @@ export const FloatingControls = ({
   isSaving,
   loading,
 }: FloatingControlsProps) => {
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      const mobile = window.innerWidth < 768
-      setIsMobile(mobile)
-    }
-
-    checkScreenSize()
-    window.addEventListener("resize", checkScreenSize)
-    return () => window.removeEventListener("resize", checkScreenSize)
-  }, [])
+  const { isMobile } = useMobileDetection()
 
   // Spreadsheet mode controls
   if (isSpreadsheetMode) {
