@@ -146,18 +146,9 @@ export const ModernDataTable = () => {
 
   const columns = useMemo(
     () => [
-      // Edit button column - moved to the left
+      // Single actions column containing all buttons
       columnHelper.display({
-        id: "edit",
-        header: "",
-        cell: () => null, // Handled in EditableSupplierRow
-        enableSorting: false,
-        enableHiding: false,
-        size: columnWidths.edit,
-      }),
-      // Checkbox column - hidden in spreadsheet mode
-      columnHelper.display({
-        id: "select",
+        id: "actions",
         header: ({ table }) =>
           !isSpreadsheetMode ? (
             <div className="flex items-center justify-center h-8 w-full">
@@ -172,10 +163,10 @@ export const ModernDataTable = () => {
               />
             </div>
           ) : null,
-        cell: () => null,
+        cell: () => null, // Handled in EditableSupplierRow
         enableSorting: false,
         enableHiding: false,
-        size: isSpreadsheetMode ? 0 : columnWidths.select,
+        size: columnWidths.actions,
       }),
       columnHelper.accessor("name", {
         header: "Supplier Name",
@@ -290,7 +281,7 @@ export const ModernDataTable = () => {
     })
   }
 
-  const focusedRowIndex = useKeyboardNavigation({
+  const { focusedRowIndex } = useKeyboardNavigation({
     totalRows: table.getRowModel().rows.length,
     rowSelection,
     setRowSelection,
@@ -388,7 +379,7 @@ export const ModernDataTable = () => {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="w-full">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="flex items-center justify-between">
@@ -405,10 +396,10 @@ export const ModernDataTable = () => {
 
   return (
     <>
-      <div data-table-container className="responsive-table w-full">
+      <div data-table-container className="responsive-table w-full full-width-table">
         {/* Search and Filters - No card wrapper */}
-        <div className="px-2 py-4 space-y-3">
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <div className="py-4 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between px-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-3 w-3" />
               <Input
@@ -429,49 +420,29 @@ export const ModernDataTable = () => {
               )}
             </div>
           </div>
-          <StatusFilters activeFilter={statusFilter} onFilterChange={setStatusFilter} counts={statusCounts} />
+          <div className="px-4">
+            <StatusFilters activeFilter={statusFilter} onFilterChange={setStatusFilter} counts={statusCounts} />
+          </div>
         </div>
 
         {/* Table - Full width, no borders */}
-        <div className="w-full overflow-hidden">
-          <div style={{ width: "100%", tableLayout: "fixed" }}>
-            <Table className="border-0 w-full" style={{ tableLayout: "fixed" }}>
-              <colgroup>
-                <col style={{ width: "24px" }} />
-                <col style={{ width: `${columnWidths.edit}px` }} />
-                {!isSpreadsheetMode && <col style={{ width: `${columnWidths.select}px` }} />}
-                <col style={{ width: `${columnWidths.name}px` }} />
-                <col style={{ width: `${columnWidths.website}px` }} />
-                <col style={{ width: `${columnWidths.phone}px` }} />
-                <col style={{ width: `${columnWidths.status}px` }} />
-                <col style={{ width: `${columnWidths.created}px` }} />
-              </colgroup>
+        <div className="w-full">
+          <Table className="border-0 w-full" style={{ tableLayout: "fixed", width: "100%" }}>
+            <colgroup>
+              <col style={{ width: `${columnWidths.actions}px` }} />
+              <col style={{ width: `${columnWidths.name}px` }} />
+              <col style={{ width: `${columnWidths.website}px` }} />
+              <col style={{ width: `${columnWidths.phone}px` }} />
+              <col style={{ width: `${columnWidths.status}px` }} />
+              <col style={{ width: `${columnWidths.created}px` }} />
+            </colgroup>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id} className="border-b border-gray-200 h-8">
-                    <TableHead className="w-6 p-0 border-0 h-8">
-                      <div className="flex items-center justify-center h-8 w-full pl-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-5 w-5 p-0 text-gray-400 hover:text-gray-600"
-                          onClick={resetColumnWidths}
-                          title="Reset column widths"
-                        >
-                          <Columns3 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableHead>
                     {headerGroup.headers.map((header, index) => {
-                      // Skip rendering select column header in spreadsheet mode
-                      if (header.id === "select" && isSpreadsheetMode) {
-                        return null
-                      }
-
                       const isLastColumn = index === headerGroup.headers.length - 1
-                      const isEditColumn = header.id === "edit"
-                      const isSelectColumn = header.id === "select"
-                      const showResizer = !isLastColumn && !isEditColumn && !isSelectColumn
+                      const isActionsColumn = header.id === "actions"
+                      const showResizer = !isLastColumn && !isActionsColumn
 
                       return (
                         <TableHead
@@ -483,12 +454,27 @@ export const ModernDataTable = () => {
                             className={`flex items-center gap-2 pr-4 py-2 px-2 h-8 transition-colors ${
                               header.column.getCanSort()
                                 ? "cursor-pointer select-none hover:bg-gray-50"
-                                : header.id !== "edit" && header.id !== "select"
+                                : header.id !== "actions"
                                   ? "hover:bg-gray-50"
                                   : ""
                             }`}
                             onClick={header.column.getToggleSortingHandler()}
                           >
+                            {/* Show reset button only in actions column header */}
+                            {isActionsColumn && !isSpreadsheetMode && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-5 w-5 p-0 text-gray-400 hover:text-gray-600 mr-1"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  resetColumnWidths()
+                                }}
+                                title="Reset column widths"
+                              >
+                                <Columns3 className="h-3 w-3" />
+                              </Button>
+                            )}
                             {header.isPlaceholder
                               ? null
                               : flexRender(header.column.columnDef.header, header.getContext())}
@@ -535,7 +521,7 @@ export const ModernDataTable = () => {
 
                 {loading && !table.getRowModel().rows?.length ? (
                   <TableRow className="h-12">
-                    <TableCell colSpan={columns.length + 1} className="h-12 text-center border-0">
+                    <TableCell colSpan={columns.length} className="h-12 text-center border-0">
                       <div className="flex items-center justify-center gap-2">
                         <Loader2 className="h-3 w-3 animate-spin" />
                         <span className="text-xs">Loading suppliers...</span>
@@ -580,7 +566,7 @@ export const ModernDataTable = () => {
                   ))
                 ) : (
                   <TableRow className="h-12">
-                    <TableCell colSpan={columns.length + 1} className="h-12 text-center border-0">
+                    <TableCell colSpan={columns.length} className="h-12 text-center border-0">
                       <div className="flex flex-col items-center gap-2 text-gray-500">
                         <AlertCircle className="h-6 w-6" />
                         <p className="text-xs">No suppliers found</p>
@@ -605,10 +591,9 @@ export const ModernDataTable = () => {
               </TableBody>
             </Table>
           </div>
-        </div>
 
         {/* Pagination */}
-        <div className="px-2">
+        <div className="px-4">
           <PaginationControls
             pageIndex={pagination.pageIndex}
             pageSize={pagination.pageSize}
@@ -672,13 +657,13 @@ export const ModernDataTable = () => {
 
       <style jsx>{`
         .responsive-table {
-          /* Fixed row height for consistent alignment */
-          --row-height: 48px;
+          /* Fixed row height for consistent alignment - accommodates 2 lines */
+          --row-height: 56px;
         }
 
         @media (max-width: 768px) {
           .responsive-table {
-            --row-height: 56px;
+            --row-height: 60px;
           }
         }
 
@@ -692,7 +677,7 @@ export const ModernDataTable = () => {
           padding: 0;
           border: 0;
           vertical-align: middle;
-          overflow: hidden;
+          overflow: visible;
         }
 
         .responsive-table :global(th) {
@@ -702,15 +687,22 @@ export const ModernDataTable = () => {
           vertical-align: middle;
         }
 
-        /* Multi-line text support */
+        /* Multi-line text support - limit to 2 lines for better readability */
         .responsive-table :global(.cell-content) {
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
-          line-height: 1.2;
-          max-height: 2.4em;
+          line-height: 1.4;
+          max-height: 2.8em;
           word-break: break-word;
+          text-overflow: ellipsis;
+        }
+        
+        /* Allow input focus outlines to be visible */
+        .responsive-table :global(input),
+        .responsive-table :global(textarea) {
+          overflow: visible;
         }
 
         /* Ensure table layout is truly fixed */

@@ -101,7 +101,7 @@ export const EditableSupplierRow = ({
     }
   }, [isEditing, onCancel])
 
-  const handleKeyDown = (e: React.KeyboardEvent, nextRef?: React.RefObject<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent, nextRef?: React.RefObject<HTMLInputElement | null>) => {
     if (e.key === "Tab" && nextRef?.current) {
       e.preventDefault()
       nextRef.current.focus()
@@ -110,6 +110,12 @@ export const EditableSupplierRow = ({
       if (isFormValid()) {
         onSave(formData)
       }
+    }
+  }
+
+  const handleDoubleClickEdit = () => {
+    if (!isEditing && !isSpreadsheetMode) {
+      onEdit(supplier.id, {})
     }
   }
 
@@ -169,42 +175,36 @@ export const EditableSupplierRow = ({
   if (isEditing) {
     return (
       <TableRow className="bg-gray-50 border-b border-gray-200 h-12">
-        <TableCell className="p-0 h-12" />
-        <TableCell className="p-0 h-12" style={{ width: columnWidths.edit }}>
-          <ButtonContainer className="pl-1">
+        <TableCell className="p-0 h-12" style={{ width: columnWidths.actions }}>
+          <div className="flex items-center justify-center gap-3 h-12 px-2">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(checked) => onSelect(!!checked)}
+              aria-label="Select row"
+              className="h-4 w-4 checkbox-action"
+              disabled={isSaving}
+            />
             <Button
               size="sm"
               variant="ghost"
-              className="h-6 w-6 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+              className="h-7 w-7 p-0 text-green-600 hover:text-green-700 hover:bg-green-50 action-button edit-action"
               onClick={() => onSave(formData)}
               disabled={isSaving || !isFormValid()}
               title="Save changes (Enter)"
             >
               {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
             </Button>
-          </ButtonContainer>
-        </TableCell>
-        <TableCell className="p-1 h-12" style={{ width: columnWidths.select }}>
-          <ButtonContainer>
-            <div className="flex items-center gap-3">
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={(checked) => onSelect(!!checked)}
-                aria-label="Select row"
-                className="h-4 w-4"
-                disabled={isSaving}
-              />
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-4 w-4 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                onClick={onShowPurchaseHistory}
-                title="View purchase history"
-              >
-                <BarChart3 className="h-3 w-3" />
-              </Button>
-            </div>
-          </ButtonContainer>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 action-button data-action"
+              onClick={onCancel}
+              disabled={isSaving}
+              title="Cancel changes (Escape)"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
         </TableCell>
         <TableCell className="p-1 h-12" style={{ width: columnWidths.name }}>
           <Input
@@ -255,18 +255,7 @@ export const EditableSupplierRow = ({
           </Select>
         </TableCell>
         <TableCell className="p-1 h-12" style={{ width: columnWidths.created }}>
-          <ButtonContainer>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={onCancel}
-              disabled={isSaving}
-              title="Cancel changes (Escape)"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </ButtonContainer>
+          <div className="text-sm text-gray-400 text-center">-</div>
         </TableCell>
       </TableRow>
     )
@@ -280,60 +269,53 @@ export const EditableSupplierRow = ({
       data-state={isSelected && "selected"}
       onClick={handleRowClick}
     >
-      <TableCell className="p-0 h-12" />
-      <TableCell className="p-0 h-12" style={{ width: columnWidths.edit }}>
-        <ButtonContainer className="pl-1">
-          {isSpreadsheetMode ? (
-            hasRowChanges ? (
+      <TableCell className="p-0 h-12" style={{ width: columnWidths.actions }}>
+        {!isSpreadsheetMode ? (
+          <div className="flex items-center justify-center gap-3 h-12 px-2">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={(checked) => onSelect(!!checked)}
+              onClick={handleCheckboxClick}
+              aria-label="Select row"
+              className="h-4 w-4 hover:bg-gray-100 checkbox-action"
+            />
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0 text-gray-600 hover:text-gray-700 hover:bg-gray-50 action-button edit-action"
+              onClick={handleStartEdit}
+              title="Edit supplier"
+            >
+              <Edit className="h-3 w-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 action-button data-action"
+              onClick={onShowPurchaseHistory}
+              title="View purchase history"
+            >
+              <BarChart3 className="h-3 w-3" />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-12 px-2">
+            {hasRowChanges ? (
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-6 w-6 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                className="h-7 w-7 p-0 text-orange-600 hover:text-orange-700 hover:bg-orange-50"
                 onClick={handleUndoRowChanges}
                 title="Undo changes to this row"
               >
                 <Undo2 className="h-3 w-3" />
               </Button>
             ) : (
-              <div className="h-6 w-6" />
-            )
-          ) : (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-6 w-6 p-0 text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-              onClick={handleStartEdit}
-              title="Edit supplier"
-            >
-              <Edit className="h-3 w-3" />
-            </Button>
-          )}
-        </ButtonContainer>
+              <div className="h-7 w-7" />
+            )}
+          </div>
+        )}
       </TableCell>
-      {!isSpreadsheetMode && (
-        <TableCell className="p-1 h-12" style={{ width: columnWidths.select }}>
-          <ButtonContainer>
-            <div className="flex items-center gap-3">
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={(checked) => onSelect(!!checked)}
-                onClick={handleCheckboxClick}
-                aria-label="Select row"
-                className="h-4 w-4 hover:bg-gray-100"
-              />
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-4 w-4 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                onClick={onShowPurchaseHistory}
-                title="View purchase history"
-              >
-                <BarChart3 className="h-3 w-3" />
-              </Button>
-            </div>
-          </ButtonContainer>
-        </TableCell>
-      )}
       <TableCell
         className="font-medium text-xs p-1 h-12"
         style={{ width: columnWidths.name, maxWidth: columnWidths.name }}
@@ -347,12 +329,16 @@ export const EditableSupplierRow = ({
               rowIndex={rowIndex}
               colIndex={0}
               isSpreadsheetMode={isSpreadsheetMode}
-              hasChanges={hasRowChanges}
+              hasChanges={hasRowChanges || false}
               onChange={handleSpreadsheetChange}
             />
           </div>
         ) : (
-          <div className="h-full flex items-center">
+          <div 
+            className="h-full flex items-center cursor-pointer" 
+            onDoubleClick={handleDoubleClickEdit}
+            title="Double-click to edit"
+          >
             <div className="cell-content" title={supplier.name}>
               {supplier.name}
             </div>
@@ -369,12 +355,16 @@ export const EditableSupplierRow = ({
               rowIndex={rowIndex}
               colIndex={1}
               isSpreadsheetMode={isSpreadsheetMode}
-              hasChanges={hasRowChanges}
+              hasChanges={hasRowChanges || false}
               onChange={handleSpreadsheetChange}
             />
           </div>
         ) : (
-          <div className="h-full flex items-center">
+          <div 
+            className="h-full flex items-center cursor-pointer" 
+            onDoubleClick={handleDoubleClickEdit}
+            title="Double-click to edit"
+          >
             {supplier.website ? (
               <a
                 href={supplier.website}
@@ -402,12 +392,16 @@ export const EditableSupplierRow = ({
               rowIndex={rowIndex}
               colIndex={2}
               isSpreadsheetMode={isSpreadsheetMode}
-              hasChanges={hasRowChanges}
+              hasChanges={hasRowChanges || false}
               onChange={handleSpreadsheetChange}
             />
           </div>
         ) : (
-          <div className="h-full flex items-center">
+          <div 
+            className="h-full flex items-center cursor-pointer" 
+            onDoubleClick={handleDoubleClickEdit}
+            title="Double-click to edit"
+          >
             {supplier.phone ? (
               <a
                 href={`tel:${supplier.phone}`}
@@ -432,7 +426,7 @@ export const EditableSupplierRow = ({
               rowIndex={rowIndex}
               colIndex={3}
               isSpreadsheetMode={isSpreadsheetMode}
-              hasChanges={hasRowChanges}
+              hasChanges={hasRowChanges || false}
               onChange={handleSpreadsheetChange}
             />
           </div>
